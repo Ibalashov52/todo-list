@@ -8,11 +8,37 @@ use App\DTO\UserDto;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegistrationRequest;
 use App\Http\Resources\RespondWithTokenResource;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
     /**
+     * @group Авторизация
+     *
+     * Регистрация
+     *
+     * @authorized
+     * @bodyParam nickname string required Имя пользователя. Обязательная уникальная строка от 4 до 10 символов
+     * Example: TestUser
+     * @bodyParam password string required Пароль пользователя. Обязательная строка от 4 до 10 символов
+     * Example: TestPass
+     *
+     * @response 422 scenario="error"
+     * {
+     *      "message": "The password field must not be greater than 10 characters.",
+     *      "errors": {
+     *          "password": [
+     *              "The password field must not be greater than 10 characters."
+     *          ]
+     *      },
+     * }
+     *
+     * @response 200 scenario="success"
+     * {
+     *          "nickname": "TestUser",
+     *          "id": 1
+     * }
      * @param RegistrationRequest $request
      * @param AddUserAction $action
      * @return JsonResponse
@@ -29,7 +55,7 @@ class AuthController extends Controller
 
         $user = $action($dto);
 
-        return response()->json([$user->toArray()], 201);
+        return response()->json(UserResource::make($user), 201);
     }
 
     /**
